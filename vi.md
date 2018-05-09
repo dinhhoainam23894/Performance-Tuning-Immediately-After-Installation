@@ -1,5 +1,5 @@
-# MySQL 5.7 điều chỉnh hiệu suất ngay sau khi cài đặt
-Blog này cập nhật [blog của Stephane Combaudon về điều chỉnh hiệu suất MySQL][1], và bao gồm cả điều chỉnh hiệu suất ngay sau khi cài đặt của MySQL 5.7.
+# MySQL 5.7 điều chỉnh hiệu năng ngay sau khi cài đặt
+Blog này cập nhật [blog của Stephane Combaudon về điều chỉnh hiệu năng MySQL][1], và bao gồm cả điều chỉnh hiệu năng ngay sau khi cài đặt của MySQL 5.7.
 
 Vài năm trước đây, Stephane Combaudon đã viết 1 blog trên [10 cài đặt tùy chỉnh hiệu suất MySQL sau khi cài đặt ][1] bao gồm (cả hiện tại) các bản cũ hơn của MySQL: 5.1, 5.5 và 5.6. Trong bài đăng này, tôi sẽ xem xét các điều chỉnh trong MYSQL 5.7 ( với trọng tâm vào InnoDB).
 
@@ -16,7 +16,7 @@ Trong MySQL 5.7. chỉ có duy nhất 4 biến quan trong cần thay đổi. Tuy
 Để bắt đầu, thêm các cài đặt sau vào my.cnf dưới phần [mysqld]. Bạn sẽ cần khởi động lại MySQL:
 [mysqld] 
 # other variables here 
-innodb_buffer_pool_size = 1G # (chỉnh sửa dữ liệu ở đây, 50%-70% của toàn bộ RAM)
+innodb_buffer_pool_size = 1G # (chỉnh sửa giá trị ở đây, 50%-70% của toàn bộ RAM)
 innodb_log_file_size = 256M 
 innodb_flush_log_at_trx_commit = 1 # có thể đổi thành 2 hoặc 0 
 innodb_flush_method = O_DIRECT
@@ -44,7 +44,7 @@ Kích thước vùng đệm InnoDB. Hãy xem những đồ thị sau:
 
 ![MySQL 5.7 Performance Tuning][5]
 
-Như chúng ta có thể thấy, chúng ta có thể hưởng lợi từ việc tăng kích thước vùng đệm InnoDB 1 chút lên ~10G, vì chúng ta có RAM và số trang miễn phí nhỏ so với tổng số vùng đệm.
+Như chúng ta có thể thấy, chúng ta có thể hưởng lợi từ việc tăng kích thước vùng đệm InnoDB 1 chút lên ~10G, vì chúng ta có RAM và số trang rỗi nhỏ so với tổng số vùng đệm.
 
 Kích thước file log InnoDB. Xem đồ thị sau:
 
@@ -64,7 +64,7 @@ Cài đặt [innodb_autoinc_lock_mode][8] =2 (chế độ interleaved) có thể
 
 innodb_io_capacity và innodb_io_capacity_max
 
-Đây là một điều chỉnh nâng cao hơn, và chỉ có ý nghĩa khi bạn đang thực hiện việc viết rất nhiều trong tất cả các thời gian ( nó không áp dụng cho việc đọc, ví dụ các lệnh SELECT). Nếu bạn thực sự cần điều chỉnh nó, cách tốt nhất là bạn phải biết có bao nhiêu IOPS mà hệ thống có thể thực hiện. Ví dụ, nếu server có 1 drive SSD, chúng ta có thể đặt innodb_io_capacity_max=6000 và innodb_io_capacity=3000 (50% của tối đa) . Đây là 1 ý tưởng tốt để chạy sysbench hay bất cứ công cụ benchmark nào để đánh giá thông lượng đĩa.
+Đây là một điều chỉnh nâng cao hơn, và chỉ có ý nghĩa khi bạn luôn luôn  thực hiện việc viết rất nhiều ( nó không áp dụng cho việc đọc, ví dụ các lệnh SELECT). Nếu bạn thực sự cần điều chỉnh nó, cách tốt nhất là bạn phải biết có bao nhiêu IOPS mà hệ thống có thể thực hiện. Ví dụ, nếu server có 1 drive SSD, chúng ta có thể đặt innodb_io_capacity_max=6000 và innodb_io_capacity=3000 (50% của tối đa) . Đây là 1 ý tưởng tốt để chạy sysbench hay bất cứ công cụ benchmark nào để đánh giá thông lượng đĩa.
 
 Nhưng liệu chúng ta có cần phải lo lắng về cài đặt này?Xem biểu đồ về [những trang bẩn][9] của vùng đệm":
 
